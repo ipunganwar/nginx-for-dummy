@@ -124,8 +124,16 @@ http {
         # Get inheritanced by all child context
         # Child context can ovveride inheritance by re-declaring directive
         ####################################
-        root /sites/demo;
+        root /site/site2;
 
+        # Completely ovverides inheritances from (1)
+        access_log off;
+
+        location /image {
+            # Uses root directive inherited from (2)
+            try_files $uri /stock.png;
+        }
+        
         location /secret {
             ######## (3) Action Directive ########
             # invokes an action such as rewrite or redirect
