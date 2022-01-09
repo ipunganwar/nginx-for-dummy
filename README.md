@@ -1,7 +1,6 @@
 # nginx-for-dummy
 How to run this repo
- - docker build -t nginx-server .
- - docker run -p 80:80 --name nginx -d nginx-server
+ - docker-compose up
 
 ## Mime.types
 to Handle Content-Type such as: HTML, CSS etc.
@@ -26,28 +25,28 @@ Accept-Ranges: bytes
 ## Prefix Match in Location Block
 ```
 # Prefix Match
-    # location /greet {
-    #   return 200 'Hello NGINX "/greet" location.';
+    location /greet {
+        return 200 'Hello NGINX "/greet" location.';
 # }
 
 # Preferential Prefix Match
-    # location ^~ /Greet2 {
-    #   return 200 'Hello NGINX "/greet" location.';
+    location ^~ /Greet2 {
+       return 200 'Hello NGINX "/greet" location.';
 # }
 
 # Exact Match
-    # location = /greet {
-    #   return 200 'Hello NGINX "/greet" location. EXACT-MATCH';
+    location = /greet {
+       return 200 'Hello NGINX "/greet" location. EXACT-MATCH';
 # }
 
 # REGEX Match (case sensitive)
-    # location ~ /greet[0-9] {
-    #   return 200 'Hello NGINX "/greet" location. REGEX-MATCH SENSITIVE';
+    location ~ /greet[0-9] {
+       return 200 'Hello NGINX "/greet" location. REGEX-MATCH SENSITIVE';
 # }
 
 # REGEX Match (case INsensitive)
-    # location ~* /greet[0-9] {
-    #   return 200 'Hello NGINX "/greet" location. REGEX-MATCH INSENSITIVE';
+    location ~* /greet[0-9] {
+       return 200 'Hello NGINX "/greet" location. REGEX-MATCH INSENSITIVE';
 # }
 
 ```
@@ -66,4 +65,29 @@ Use Case:
     location /logo {
       return 307 /thumb.png;
     }
+```
+
+# Try_Files Redirect
+try_files redirective will redirect and rewrite if path not found
+
+```
+server {
+    try_files path1 path2 final;
+    //OR
+    location / {
+        try_files path1 path2 final;
+    }
+}
+```
+
+in our case we will implement this case
+```
+try_files $uri /cat.png /greet /friendly_404; //cat.png is not-found
+
+location /greet {
+    return 200 'Hello User';
+}
+location /friendly_404 {
+    return 404 'Sorry, that file you search is not found';
+}
 ```
