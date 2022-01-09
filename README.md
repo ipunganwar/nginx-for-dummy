@@ -91,3 +91,47 @@ location /friendly_404 {
     return 404 'Sorry, that file you search is not found';
 }
 ```
+
+# Directives
+
+```
+######## (1) Array Directive ########
+# Can be specified multiple times without ovveriding a previous setting
+# Gets inherited by all child context
+# Child context can ovveride inheritance by re-declaring directive
+####################################
+acces_log /var/log/nginx/access.log;
+access_log /var/log/nginx/custom.log.gz custom_format;
+
+http {
+
+    # Include statement - non directive
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name site1.com;
+
+        # Inherits access_log from parent context (1)
+    }
+
+    server {
+        listen 80;
+        server_name site2.com;
+
+        ######## (2) Standart Directive ########
+        # Can only be declared once. A second declaration ovverides the first.
+        # Get inheritanced by all child context
+        # Child context can ovveride inheritance by re-declaring directive
+        ####################################
+        root /sites/demo;
+
+        location /secret {
+            ######## (3) Action Directive ########
+            # invokes an action such as rewrite or redirect
+            # Inheritance does not apply as the request is either stopped (redirect/response) or re-evaluated (re-write)
+            ####################################
+            return 403 'You do not have permission to view this.';
+        }
+    }
+}
