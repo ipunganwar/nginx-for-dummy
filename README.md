@@ -218,3 +218,55 @@ For localhost ssl, please refer to this docs: https://musaamin.web.id/cara-insta
  }
  ```
  to verify run this cmd: `curl -I https://localhost`
+
+
+ # Push Server
+ How to know Push Server can improve nginx performance:
+ - `install brew nghttp2` for client purpose testing
+
+ Then run `nghttp -nysa https://localhost/index.html`, the result will like this:
+
+ ```
+id  responseEnd requestStart  process code size request path
+ 13     +5.02ms       +160us   4.86ms  200   1K /index.html
+ 15     +7.76ms      +5.05ms   2.71ms  200  487 /style.css
+ 17     +7.80ms      +5.05ms   2.74ms  200  12K /thumb.png
+ ```
+
+For Nginx config, add this script:
+```
+server {
+    location = /index.html {
+      http2_push /style.css;
+      http2_push /thumb.png;
+    }
+}
+```
+
+Then reload NGINX and run this command again `nghttp -nysa https://localhost/index.html`, thre outcome will like this:
+```
+id  responseEnd requestStart  process code size request path
+ 13     +2.38ms       +161us   2.22ms  200   1K /index.html
+  2     +2.49ms *    +1.70ms    786us  200  487 /style.css
+  4     +4.75ms *    +1.73ms   3.02ms  200  12K /thumb.png
+
+```
+
+## Noted :
+- in responseEnd the asterix(*) indicates it has been pushed from the server, and responseEnd time has been decreased.
+
+
+# Encrypt SSL
+First setup ssl_protocols and ssl_chiper in our server config.
+    - First generate dhparams: `openssl dhparam 2048 -out conf/ssl/dhparam.pem`
+```
+# Disable SSL
+ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+# Optimise chiper suits
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+# Enable DH Params
+    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+```
