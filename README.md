@@ -1,6 +1,6 @@
 # nginx-for-dummy
 How to run this repo
- - docker-compose up
+ - `docker-compose up --build`
 
 ## Mime.types
 to Handle Content-Type such as: HTML, CSS etc.
@@ -133,7 +133,6 @@ http {
             # Uses root directive inherited from (2)
             try_files $uri /stock.png;
         }
-        
         location /secret {
             ######## (3) Action Directive ########
             # invokes an action such as rewrite or redirect
@@ -143,3 +142,63 @@ http {
         }
     }
 }
+```
+
+# Worker Processes
+- Worker processes:
+    - Nginx worker process that handles the incoming request.
+    - Set this to `worker_process auto;` to automatically adjust the number of Nginx worker processes based on available cores, try to run `lscpu`.
+
+- Worker connections:
+    - Each worker process can open a by default 512 connections.
+    - You can set this to max limit `ulimit -n.`
+
+    `max_clients = worker processes * worker connections`
+
+# Header & Expires
+
+```
+server {
+    ...
+
+    location ~* \.(css|js|jpg|png) {
+      access_log off;  # Turn off log
+      add_header Cache-Control public;
+      add_header Pragma public;
+      add_header Vary Accept-Encoding;
+      expires 1M;
+    }
+}
+```
+
+# Compresses Response with Gzip
+
+```
+http {
+  gzip on;
+  gzip_comp_level 3; # level 1-9
+  gzip_types text/css;
+  gzip_types text/javascript;
+}
+```
+
+iy you want to validate it file had been supported with gzip encoding, run this cmd:
+- `curl -I -H "Accept-Encoding: gzip, deflate" localhost/style.css`
+
+Or you can download file type to compare file before after compression:
+- `curl localhost/style.css > style.css`
+- `curl -H "Accept-Encoding: gzip, deflate" localhost/style.css > style.min.css`
+
+```
+# curl localhost/style.css > style.css
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   980  100   980    0     0   136k      0 --:--:-- --:--:-- --:--:--  136k
+
+# curl -H "Accept-Encoding: gzip, deflate" localhost/style.css > style.min.css
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   487    0   487    0     0  40583      0 --:--:-- --:--:-- --:--:-- 40583
+```
+
+
