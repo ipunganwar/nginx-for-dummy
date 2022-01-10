@@ -201,4 +201,20 @@ Or you can download file type to compare file before after compression:
 100   487    0   487    0     0  40583      0 --:--:-- --:--:-- --:--:-- 40583
 ```
 
+# HTTP-2
+- First create SSL Certificate
+ - `openssl req -x509 -days 10 -nodes -newkey rsa:2048 -keyout $PWD/conf/ssl/self.key -out $PWD/conf/ssl/self.crt`
 
+For localhost ssl, please refer to this docs: https://musaamin.web.id/cara-install-https-di-localhost-nginx/
+
+ Then add this script:
+ ```
+ server {
+     listen 443 ssl http2;
+
+     ssl_certificate /etc/nginx/ssl/self.crt;
+
+     ssl_certificate_key /etc/nginx/ssl/self.key;
+ }
+ ```
+ to verify run this cmd: `curl -I https://localhost`
