@@ -257,6 +257,12 @@ id  responseEnd requestStart  process code size request path
 
 
 # Encrypt SSL
+- Disable SSL (Use TSL only)
+- Optimise Chiper Suits
+- Enable DHParams
+- Enable HSTS
+- Cache SSL Sessions
+
 First setup ssl_protocols and ssl_chiper in our server config.
     - First generate dhparams: `openssl dhparam 2048 -out conf/ssl/dhparam.pem`
 ```
@@ -269,4 +275,12 @@ ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
 # Enable DH Params
     ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+
+# Enable HSTS
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+ # SSL Session
+    ssl_session_cache shared;
+    ssl_session_timeout 4h;
+    ssl_session_tickets on;
 ```
