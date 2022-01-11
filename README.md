@@ -201,6 +201,9 @@ Or you can download file type to compare file before after compression:
 100   487    0   487    0     0  40583      0 --:--:-- --:--:-- --:--:-- 40583
 ```
 
+### Source:
+- http://nginx.org/en/docs/http/ngx_http_gzip_module.html
+
 # HTTP-2
 - First create SSL Certificate
  - `openssl req -x509 -days 10 -nodes -newkey rsa:2048 -keyout $PWD/conf/ssl/self.key -out $PWD/conf/ssl/self.crt`
@@ -255,13 +258,18 @@ id  responseEnd requestStart  process code size request path
 ## Noted :
 - in responseEnd the asterix(*) indicates it has been pushed from the server, and responseEnd time has been decreased.
 
+### Source
+- https://nghttp2.org/
+- https://www.nginx.com/blog/nginx-1-13-9-http2-server-push/
+
 
 # Encrypt SSL
-- Disable SSL (Use TSL only)
-- Optimise Chiper Suits
-- Enable DHParams
-- Enable HSTS
-- Cache SSL Sessions
+Outcome:
+    - Disable SSL (Use TSL only)
+    - Optimise Chiper Suits
+    - Enable DHParams
+    - Enable HSTS
+    - Cache SSL Sessions
 
 First setup ssl_protocols and ssl_chiper in our server config.
     - First generate dhparams: `openssl dhparam 2048 -out conf/ssl/dhparam.pem`
@@ -284,3 +292,44 @@ ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_session_timeout 4h;
     ssl_session_tickets on;
 ```
+
+### Source
+- https://hackernoon.com/algorithms-explained-diffie-hellman-1034210d5100
+- https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+
+# Rate Limit
+Outcome:
+    - Security - Brute Force Protection
+    - Reliability - Prevent Traffic Sites
+    - Shaping - Service Priority
+
+To Load Testing this use case we can use tools like:
+    - https://www.joedog.org/siege-home/
+
+First install siege: `brew install siege`
+Then run cmd: `siege -v -r 2 -c 5 https://localhost/thumb.png`, means `c5 * r2 = 10 requests`
+### Source
+- https://www.nginx.com/blog/rate-limiting-nginx/
+- https://www.freecodecamp.org/news/nginx-rate-limiting-in-a-nutshell-128fe9e0126c/
+- https://www.digitalocean.com/community/tutorials/understanding-and-implementing-fastcgi-proxying-in-nginx
+
+# Hardening Nginx
+ - Turn off the Nginx server version
+ ```
+http {
+    server_tokens off;
+}
+ ```
+
+ Then run `curl -Ik https://localhost` and the version has been hidden
+ ```
+HTTP/2 200 
+server: nginx <-This part->
+date: Tue, 11 Jan 2022 14:50:49 GMT
+content-type: text/html
+content-length: 4490
+last-modified: Thu, 12 Apr 2018 19:13:47 GMT
+etag: "5acfafeb-118a"
+strict-transport-security: max-age=31536000
+accept-ranges: bytes
+ ```
