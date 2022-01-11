@@ -1,4 +1,10 @@
-# nginx-for-dummy
+# Source Nginx Reference
+- http://nginx.org/en/docs/
+- https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/
+- https://www.digitalocean.com/community/search?q=nginx
+- https://github.com/fcambus/nginx-resources
+
+# Nginx-for-dummy
 How to run this repo
  - `docker-compose up --build`
 
@@ -336,7 +342,7 @@ accept-ranges: bytes
 
 
  - Embed Our Server with Iframe
- run `index.html` from `embed-html/index.html` then you will see our server has been delivered from our origin nginx, this is not secure.
+ run `index.html` from `embed-html-sample/index.html` then you will see our server has been delivered from our origin nginx, this is not secure.
 
  To prevent this we need add the config like this:
  ```
@@ -354,3 +360,21 @@ server {
 Refused to display 'https://localhost/' in a frame because it set 'X-Frame-Options' to 'sameorigin'.
 
  ```
+
+ # Reverse Proxy
+
+ ```
+# Reverse Proxy
+server {
+    location /nginxorg {
+        proxy_pass 'https://nginx.org/';
+    }
+}
+ ```
+
+ ## Source List of web-server:
+ - https://gist.github.com/willurd/5720255
+
+
+ # Load Balancer
+ Please refer docs from directory `load-balancer-sample`
