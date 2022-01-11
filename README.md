@@ -333,3 +333,24 @@ etag: "5acfafeb-118a"
 strict-transport-security: max-age=31536000
 accept-ranges: bytes
  ```
+
+
+ - Embed Our Server with Iframe
+ run `index.html` from `embed-html/index.html` then you will see our server has been delivered from our origin nginx, this is not secure.
+
+ To prevent this we need add the config like this:
+ ```
+server {
+
+    # put after root
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+
+}
+ ```
+
+ after reload the nginx, the the `iframe` will blank, if we see in chrome dev console, it will appears like this:
+ ```
+Refused to display 'https://localhost/' in a frame because it set 'X-Frame-Options' to 'sameorigin'.
+
+ ```
